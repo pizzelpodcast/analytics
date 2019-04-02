@@ -17,7 +17,7 @@ class Podtrac
     loop do
       # Table columns don't contain years, so we need to figure it
       # out through the URL
-      year = daily_uri_to_year(daily.uri)
+      year = daily_uri_to_year(current_page.uri)
 
       table = current_page.css(".report table[width='100%']")
 
