@@ -15,15 +15,30 @@ class Podtrac
     episodes = {}
 
     loop do
-      # Table columns don't contain years, so we need to figure it
-      # out through the URL
+      # Table columns don't contain years, so we need to figure it out through
+      # the current page's URL
+      #
+      # Note that the year for the current page belongs to the left-most
+      # column, so if we're on a page that begins at the end of december (e.g.
+      # left-most column is Dec 31) some of the columns on the right might
+      # actually skip into January of the next year
       year = daily_uri_to_year(current_page.uri)
 
       table = current_page.css(".report table[width='100%']")
 
-      # Find the dates displayed in the current page
-      dates = table.css("tr.group-row:first th")[2..-1].map do |th|
-        Date.civil(year, *th.text.strip.split("/").map(&:to_i))
+      # Find the dates displayed in the current page, first as just month/day
+      # pairs
+      raw_dates = table.css("tr.group-row:first th")[2..-1].map do |th, i|
+        th.text.strip.split("/").map(&:to_i)
+      end
+
+      # Build actual date objects skipping to next year if needed
+      dates = raw_dates.map do |(month, day)|
+        Date.new(
+          (raw_dates.first.first == 12 && month == 1) ? year + 1 : year,
+          month,
+          day
+        )
       end
 
       table.css("tr.data-row").each do |tr|
