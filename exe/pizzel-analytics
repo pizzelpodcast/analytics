@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+$: << File.expand_path(File.join(__dir__, "../lib"))
+
+require "rubygems"
+require "bundler/setup"
+require "yaml"
+require "fileutils"
+require "thor"
+require "pizzel"
+#require "pry-byebug"
+
+class CLI < Thor
+  include Thor::Actions
+
+  DATA_DIR = Pizzel::USER_DIR.join("analytics_data").freeze
+
+  desc "fetch", "Fetches download counts from Podtrac"
+  method_option :nogit, desc: "Don't attempt to commit changes after fetching"
+  def fetch
+    require "pizzel/podtrac"
+
+    podtrac = Pizzel::Podtrac.new(Pizzel.config["podtrac"])
+
+    FileUtils.mkdir_p(DATA_DIR)
+
+    data_path = DATA_DIR.join("episodes.yml")
+
+    if File.exist?(data_path)
+      episodes = Pizzel::Episodes.load(YAML.load_file(data_path))
+      podtrac.scrape_episode_daily_data(episodes: episodes)
+    else
+      episodes = podtrac.scrape_episode_daily_data
+    end
+
+    File.open(data_path, "w") do |f|
+      YAML.dump(episodes.to_h, f)
+    end
+
+    unless options[:nogit]
+      Dir.chdir(DATA_DIR) { system "git add . && git commit -m 'Update analytics data'" }
+    end
+  end
+
+  desc "git <git command> [git options]",
+    "Runs a git command in the analytics data directory"
+  def git(*args)
+    Dir.chdir(DATA_DIR) { exec "git", *args }
+  end
+end
+
+CLI.start(ARGV)
+
+# vim: filetype=ruby:

@@ -5,6 +5,7 @@ PATH
       mechanize
       pry
       pry-byebug
+      thor
 
 GEM
   remote: https://rubygems.org/
@@ -43,6 +44,7 @@ GEM
       byebug (~> 11.0)
       pry (~> 0.13.0)
     rake (10.5.0)
+    thor (1.0.1)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)

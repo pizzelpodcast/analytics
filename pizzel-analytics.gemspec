@@ -39,4 +39,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "mechanize"
   spec.add_dependency "pry"
   spec.add_dependency "pry-byebug"
+  spec.add_dependency "thor"
 end
