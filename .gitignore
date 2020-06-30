@@ -1,2 +1,8 @@
-config.yml
-data/*.yml
+/.bundle/
+/.yardoc
+/_yardoc/
+/coverage/
+/doc/
+/pkg/
+/spec/reports/
+/tmp/
