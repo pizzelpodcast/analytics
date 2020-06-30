@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+# frozen_string_literal: true
+
+# TODO:
+#
+# - Multiple writable targets (Google Spreadsheet, YAML, JSON?)
+# - Use previous data to prevent downloading more pages than needed
+
+$: << File.expand_path(File.join(__dir__, "../lib"))
+
+require "rubygems"
+require "bundler/setup"
+require "yaml"
+require "fileutils"
+require "pizzel/podtrac"
+#require "pry-byebug"
+
+CONFIG = YAML.load_file(File.expand_path("~/.pizzel/config")).freeze
+
+DATA_DIR = File.expand_path("~/.pizzel/analytics_data")
+
+FileUtils.mkdir_p(DATA_DIR)
+
+DATA_FILE = File.join(DATA_DIR, "episodes.yml")
+
+podtrac = Pizzel::Podtrac.new(CONFIG["podtrac"])
+
+if File.exist?(DATA_FILE)
+  episodes = Pizzel::Episodes.load(YAML.load_file(DATA_FILE))
+  podtrac.scrape_episode_daily_data(episodes: episodes)
+else
+  episodes = podtrac.scrape_episode_daily_data
+end
+
+File.open(DATA_FILE, "w") do |f|
+  YAML.dump(episodes.to_h, f)
+end
+
+puts "✓"
+
+# vim: filetype=ruby:
