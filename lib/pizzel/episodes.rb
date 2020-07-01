@@ -2,6 +2,8 @@
 
 module Pizzel
   class Episodes
+    EPISODE_NUMBER_MATCHER = /Pizzel Ep. (\d+)/
+
     include Enumerable
 
     attr_reader :oldest_date, :most_recent_date
@@ -34,6 +36,22 @@ module Pizzel
       @episodes.each(&block)
     end
 
+    # Counts the number of total "data points" (e.g. downloads on a single day
+    # for one episode)
+    def data_count
+      @episodes.sum { |_, v| v.length }
+    end
+
+    # Just like each, but uses just ep numbers as keys instead of full ep names
+    #
+    def each_by_number(&block)
+      return to_enum(:each_by_number) unless block_given?
+
+      each do |k, v|
+        yield k.match(EPISODE_NUMBER_MATCHER)[1].to_i, v
+      end
+    end
+
     def to_h
       {
         updated_to: @most_recent_date,
@@ -53,9 +71,19 @@ module Pizzel
     end
 
     class DownloadsMap
+      include Enumerable
+
       def initialize(episodes)
         @episodes = episodes
         @dates ||= {}
+      end
+
+      def each(&block)
+        @dates.each(&block)
+      end
+
+      def length
+        @dates.length
       end
 
       def []=(date, value)

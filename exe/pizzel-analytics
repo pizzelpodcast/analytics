@@ -13,8 +13,6 @@ require "pizzel"
 #require "pry-byebug"
 
 class CLI < Thor
-  include Thor::Actions
-
   DATA_DIR = Pizzel::USER_DIR.join("analytics_data").freeze
 
   desc "fetch", "Fetches download counts from Podtrac"
@@ -22,7 +20,7 @@ class CLI < Thor
   def fetch
     require "pizzel/podtrac"
 
-    podtrac = Pizzel::Podtrac.new(Pizzel.config["podtrac"])
+    podtrac = Pizzel::Podtrac.new(Pizzel.config.fetch("podtrac"))
 
     FileUtils.mkdir_p(DATA_DIR)
 
@@ -44,9 +42,37 @@ class CLI < Thor
     end
   end
 
+  desc "upsheet", "Uploads current Podtrac data to Google Sheets"
+  def upsheet
+    require "pizzel/gsheets"
+
+    data_path = DATA_DIR.join("episodes.yml")
+    episodes = Pizzel::Episodes.load(YAML.load_file(data_path))
+
+    Pizzel::GSheets.new(
+      Pizzel.config.fetch("gsheets"),
+      episodes
+    ).sync
+
+    puts "#{episodes.data_count} rows updated"
+  end
+
+  desc "gsheets-test", "Tests connection to Google Spreadsheets"
+  def gsheets_test
+    require "pizzel/gsheets"
+
+    gs = Pizzel::GSheets.new(
+      Pizzel.config.fetch("gsheets"),
+      Pizzel::Episodes.new
+    )
+
+    puts(gs.test ? "All good 👌" : "Test failed 😰")
+  end
+
   desc "git <git command> [git options]",
     "Runs a git command in the analytics data directory"
   def git(*args)
+    # exec replaces the process with the ran command, which we want here
     Dir.chdir(DATA_DIR) { exec "git", *args }
   end
 end

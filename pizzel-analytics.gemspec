@@ -40,4 +40,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "pry"
   spec.add_dependency "pry-byebug"
   spec.add_dependency "thor"
+  spec.add_dependency "google_drive"
 end

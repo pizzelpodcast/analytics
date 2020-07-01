@@ -53,7 +53,7 @@ module Pizzel
         # Build actual date objects skipping to next year if needed
         dates = raw_dates.map do |(month, day)|
           Date.new(
-            (raw_dates.first.first == 12 && month == 1) ? year + 1 : year,
+            (raw_dates.last.first == 12 && month == 1) ? year + 1 : year,
             month,
             day
           )
