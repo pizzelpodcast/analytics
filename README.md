@@ -16,3 +16,13 @@ bundle exec rake install:local
 
 You'll also need to add Podtract and Google SpreadSheets creds to your
 `~/.pizzel/config`. See [the example config](config.yml.example).
+
+### Fish autocompletion
+
+Add this to your `~/.config/fish/config.fish`:
+
+```fish
+# pizzel-analytics subcommand autocompletion
+set -l pizzel_analytics_commands fetch git upsheet gsheets-test
+complete -f -c pizzel-analytics -n "not __fish_seen_subcommand_from $pizzel_analytics_commands" -a "$pizzel_analytics_commands"
+```
