@@ -1,3 +1,9 @@
-:podtrac:
-  :email:    foo@example.com
-  :password: notarealpasswordsorrytodissapoint
+# This goes in your ~/.pizzel/config:
+
+podtrac:
+  username:
+  password:
+
+gsheets:
+  analytics_id: SPREADSHEET_ID
+  service_account_key: pizzel-service-key.json
