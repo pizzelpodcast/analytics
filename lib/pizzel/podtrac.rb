@@ -50,6 +50,8 @@ module Pizzel
           th.text.strip.split("/").map(&:to_i)
         end
 
+        # NOTE: raw_dates.first is the most recent date, raw_dates.last is the oldest
+
         # Build actual date objects skipping to next year if needed
         dates = raw_dates.map do |(month, day)|
           Date.new(
@@ -60,7 +62,7 @@ module Pizzel
         end
 
         # Check if we've reached the given date lower bound
-        break if since && dates.last <= since
+        break if since && dates.first <= since
 
         table.css("tr.data-row").each do |tr|
           # See note above about reversing order
