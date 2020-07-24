@@ -1,4 +1,5 @@
 require "yaml"
+require "pathname"
 
 module Pizzel
   USER_DIR = Pathname.new(File.expand_path("~/.pizzel")).freeze
